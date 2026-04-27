@@ -1,0 +1,14 @@
+{
+  "name": "nico-support-bot",
+  "version": "1.0.0",
+  "description": "Discord Support Bot mit Ticket-System (Galaxy Bot Stil)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "discord-html-transcripts": "^3.2.0",
+    "discord.js": "^14.19.2",
+    "dotenv": "^16.4.7"
+  }
+}
