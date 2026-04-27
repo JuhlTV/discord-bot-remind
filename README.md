@@ -52,6 +52,7 @@ npm start
 ## Slash Commands
 
 - `/setup-system` - Kompletter Setup (Rolle, Kategorien, Logs, Panel)
+- `/setup-check` - Vollstaendiger Diagnose-Check fuer Setup + Bot-Rechte
 - `/setup-support` - Postet Support-Panel
 - `/close` - Schliesst aktuelles Ticket
 - `/add user:<user>` - Fuegt User zum Ticket hinzu
