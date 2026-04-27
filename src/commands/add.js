@@ -28,13 +28,15 @@ module.exports = {
       return;
     }
 
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
     await interaction.channel.permissionOverwrites.edit(user.id, {
       ViewChannel: true,
       SendMessages: true,
       ReadMessageHistory: true
     });
 
-    await interaction.reply({ content: `${user} wurde zum Ticket hinzugefuegt.` });
+    await interaction.editReply({ content: `${user} wurde zum Ticket hinzugefuegt.` });
   }
 };
 

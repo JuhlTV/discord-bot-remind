@@ -42,8 +42,10 @@ module.exports = {
       return;
     }
 
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
     await interaction.channel.setName(name);
-    await interaction.reply({ content: `Ticket wurde umbenannt in: **${name}**` });
+    await interaction.editReply({ content: `Ticket wurde umbenannt in: **${name}**` });
   }
 };
 

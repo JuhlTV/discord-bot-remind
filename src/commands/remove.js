@@ -28,8 +28,10 @@ module.exports = {
       return;
     }
 
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
     await interaction.channel.permissionOverwrites.delete(user.id);
-    await interaction.reply({ content: `${user} wurde aus dem Ticket entfernt.` });
+    await interaction.editReply({ content: `${user} wurde aus dem Ticket entfernt.` });
   }
 };
 

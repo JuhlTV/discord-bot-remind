@@ -8,11 +8,13 @@ module.exports = {
 
   async execute(interaction, context) {
     const { ticketService } = context;
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
     const panelEmbed = ticketService.buildSupportPanelEmbed(interaction.guild);
     const panelComponents = ticketService.buildSupportPanelComponents();
 
     await interaction.channel.send({ embeds: [panelEmbed], components: panelComponents });
-    await interaction.reply({ content: "Support-Panel wurde erstellt.", flags: MessageFlags.Ephemeral });
+    await interaction.editReply({ content: "Support-Panel wurde erstellt.", flags: MessageFlags.Ephemeral });
   }
 };
 

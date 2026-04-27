@@ -122,7 +122,7 @@ module.exports = {
         }
       }
     } catch (err) {
-      if (err.code === 40060) return;
+      if (err.code === 40060 || err.code === 10062) return;
       error("Fehler bei interactionCreate", err);
       if (interaction.deferred || interaction.replied) {
         await interaction.followUp({ content: "⚠️  Es ist ein Fehler aufgetreten.", flags: MessageFlags.Ephemeral }).catch(() => null);
