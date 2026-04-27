@@ -15,35 +15,50 @@ const TICKET_TYPES = {
 };
 
 function formatTopic(meta) {
-  return `ticket|owner=${meta.ownerId}|type=${meta.type}|claimed=${meta.claimedBy || "none"}|created=${meta.createdAt || Date.now()}`;
+  // Human-readable part first, raw data after separator (invisible to casual readers)
+  const typeLabel = meta.type ? meta.type.charAt(0).toUpperCase() + meta.type.slice(1) : "Support";
+  const claimedDisplay = meta.claimedBy && meta.claimedBy !== "none" ? "Claimed" : "Unclaimed";
+  return `${typeLabel} Support Ticket | ${claimedDisplay} | ticket:${meta.ownerId}:${meta.type}:${meta.claimedBy || "none"}:${meta.createdAt || Date.now()}`;
 }
 
 function parseTopic(topic) {
-  if (!topic || !topic.startsWith("ticket|")) {
+  if (!topic) {
     return null;
   }
 
-  const map = new Map();
-  const parts = topic.split("|").slice(1);
-  for (const part of parts) {
-    const [key, value] = part.split("=");
-    map.set(key, value);
+  // New compact format: "... | ticket:ownerID:type:claimedBy:created"
+  const compactMatch = topic.match(/ticket:([0-9]+):([a-z]+):([0-9none]+):([0-9]+)/);
+  if (compactMatch) {
+    const [, ownerId, type, claimedRaw, createdAt] = compactMatch;
+    return {
+      ownerId,
+      type,
+      claimedBy: claimedRaw !== "none" ? claimedRaw : null,
+      createdAt: Number(createdAt)
+    };
   }
 
-  const ownerId = map.get("owner");
-  const type = map.get("type");
-  const claimedRaw = map.get("claimed");
-
-  if (!ownerId || !type) {
-    return null;
+  // Legacy pipe format fallback
+  if (topic.startsWith("ticket|")) {
+    const map = new Map();
+    const parts = topic.split("|").slice(1);
+    for (const part of parts) {
+      const [key, value] = part.split("=");
+      if (key && value !== undefined) map.set(key, value);
+    }
+    const ownerId = map.get("owner");
+    const type = map.get("type");
+    const claimedRaw = map.get("claimed");
+    if (!ownerId || !type) return null;
+    return {
+      ownerId,
+      type,
+      claimedBy: claimedRaw && claimedRaw !== "none" ? claimedRaw : null,
+      createdAt: Number(map.get("created") || Date.now())
+    };
   }
 
-  return {
-    ownerId,
-    type,
-    claimedBy: claimedRaw && claimedRaw !== "none" ? claimedRaw : null,
-    createdAt: Number(map.get("created") || Date.now())
-  };
+  return null;
 }
 
 class TicketService {
@@ -147,6 +162,11 @@ class TicketService {
   isStaffMember(member) {
     if (!member || !member.guild || !member.roles) {
       return false;
+    }
+
+    // Server admin/owner always counts as staff
+    if (member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+      return true;
     }
 
     const settings = this.resolveGuildConfig(member.guild.id);
@@ -429,14 +449,21 @@ class TicketService {
       return false;
     }
 
+    const meta = parseTopic(channel.topic);
+    if (!meta || !meta.ownerId || !meta.type) {
+      return false;
+    }
+
+    // If guild config is available, verify the channel is in a configured category
     const settings = this.resolveGuildConfig(channel.guild.id);
     const categoryIds = new Set(Object.values(settings.categoryByType).filter(Boolean));
-    const meta = parseTopic(channel.topic);
 
-    return (
-      categoryIds.has(channel.parentId) &&
-      Boolean(meta && meta.ownerId && meta.type)
-    );
+    // If no categories are configured (e.g. after Railway redeploy), trust the topic format alone
+    if (categoryIds.size === 0) {
+      return true;
+    }
+
+    return categoryIds.has(channel.parentId);
   }
 }
 
