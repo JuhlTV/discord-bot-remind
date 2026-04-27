@@ -1,7 +1,7 @@
 const { info } = require("../utils/logger");
 
 module.exports = {
-  name: "ready",
+  name: "clientReady",
   once: true,
   execute(client, context) {
     info(`Bot online als ${client.user.tag}`);
