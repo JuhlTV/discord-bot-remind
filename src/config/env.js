@@ -1,12 +1,7 @@
 const requiredKeys = [
   "DISCORD_TOKEN",
   "DISCORD_CLIENT_ID",
-  "GUILD_ID",
-  "BILLING_CATEGORY_ID",
-  "TECH_CATEGORY_ID",
-  "REPORT_CATEGORY_ID",
-  "SUPPORT_LOG_CHANNEL_ID",
-  "STAFF_ROLE_ID"
+  "GUILD_ID"
 ];
 
 function getConfig() {
@@ -20,13 +15,13 @@ function getConfig() {
     token: process.env.DISCORD_TOKEN,
     clientId: process.env.DISCORD_CLIENT_ID,
     guildId: process.env.GUILD_ID,
-    categoryByType: {
+    defaultCategoryByType: {
       billing: process.env.BILLING_CATEGORY_ID,
       tech: process.env.TECH_CATEGORY_ID,
       report: process.env.REPORT_CATEGORY_ID
     },
-    supportLogChannelId: process.env.SUPPORT_LOG_CHANNEL_ID,
-    staffRoleId: process.env.STAFF_ROLE_ID,
+    defaultSupportLogChannelId: process.env.SUPPORT_LOG_CHANNEL_ID,
+    defaultStaffRoleId: process.env.STAFF_ROLE_ID,
     inactivityMinutes: Number(process.env.INACTIVITY_MINUTES || 120),
     brandName: process.env.BRAND_NAME || "NICO Support",
     brandColor: Number(process.env.BRAND_COLOR || 0x00a884)

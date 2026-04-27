@@ -1,10 +1,10 @@
-# NICO Discord Support Bot
+# Remind Support Bot
 
 Ein Support-Discord-Bot im Stil von Galaxy Bot mit Ticket-System.
 
 ## Features
 
-- Ticket-Panel per `/setup-support`
+- Vollstaendiger Setup per `/setup-system`
 - Ticket-Erstellung per Typ-Button (Billing, Tech, Report)
 - Pro User nur ein offenes Ticket
 - Ticket-Claim/Unclaim fuer Support-Team
@@ -22,15 +22,17 @@ Ein Support-Discord-Bot im Stil von Galaxy Bot mit Ticket-System.
 npm install
 ```
 
-2. `.env.example` nach `.env` kopieren und Werte eintragen.
+2. `.env.example` nach `.env` kopieren und mindestens Token/Client/Guild setzen.
 
 Wichtige Variablen:
 
 - `BRAND_NAME` - Name im Panel/Embeds
 - `BRAND_COLOR` - Embed-Farbe als Dezimalwert
-- `BILLING_CATEGORY_ID` - Kategorie fuer Billing-Tickets
-- `TECH_CATEGORY_ID` - Kategorie fuer Tech-Tickets
-- `REPORT_CATEGORY_ID` - Kategorie fuer Report-Tickets
+- `BILLING_CATEGORY_ID` - Optionaler Fallback ohne `/setup-system`
+- `TECH_CATEGORY_ID` - Optionaler Fallback ohne `/setup-system`
+- `REPORT_CATEGORY_ID` - Optionaler Fallback ohne `/setup-system`
+- `SUPPORT_LOG_CHANNEL_ID` - Optionaler Fallback ohne `/setup-system`
+- `STAFF_ROLE_ID` - Optionaler Fallback ohne `/setup-system`
 - `INACTIVITY_MINUTES` - Minuten bis Auto-Close
 
 3. Bot starten:
@@ -49,6 +51,7 @@ npm start
 
 ## Slash Commands
 
+- `/setup-system` - Kompletter Setup (Rolle, Kategorien, Logs, Panel)
 - `/setup-support` - Postet Support-Panel
 - `/close` - Schliesst aktuelles Ticket
 - `/add user:<user>` - Fuegt User zum Ticket hinzu
@@ -58,5 +61,5 @@ npm start
 ## Hinweise
 
 - Die Commands werden beim Start automatisch fuer die in `GUILD_ID` gesetzte Test-Guild registriert.
-- Aendere IDs in `.env`, damit Kategorien, Rollen und Log-Channel stimmen.
+- Fuer den kompletten Setup in Discord: einmal `/setup-system` ausfuehren.
 - Claim/Unclaim ist fuer Mitglieder mit `STAFF_ROLE_ID` vorgesehen.

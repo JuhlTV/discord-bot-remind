@@ -47,8 +47,9 @@ function parseTopic(topic) {
 }
 
 class TicketService {
-  constructor(config) {
+  constructor(config, guildConfigStore) {
     this.config = config;
+    this.guildConfigStore = guildConfigStore;
     this.inactivityTimers = new Map();
     this.stats = {
       opened: 0,
@@ -57,6 +58,36 @@ class TicketService {
       autoClosed: 0,
       bootedAt: Date.now()
     };
+  }
+
+  resolveGuildConfig(guildId) {
+    const stored = this.guildConfigStore.getGuildConfig(guildId) || {};
+
+    return {
+      categoryByType: {
+        billing: stored.categoryByType?.billing || this.config.defaultCategoryByType.billing || null,
+        tech: stored.categoryByType?.tech || this.config.defaultCategoryByType.tech || null,
+        report: stored.categoryByType?.report || this.config.defaultCategoryByType.report || null
+      },
+      supportLogChannelId: stored.supportLogChannelId || this.config.defaultSupportLogChannelId || null,
+      staffRoleId: stored.staffRoleId || this.config.defaultStaffRoleId || null
+    };
+  }
+
+  setGuildConfig(guildId, settings) {
+    return this.guildConfigStore.setGuildConfig(guildId, settings);
+  }
+
+  isGuildConfigured(guildId) {
+    const settings = this.resolveGuildConfig(guildId);
+
+    return Boolean(
+      settings.staffRoleId &&
+      settings.supportLogChannelId &&
+      settings.categoryByType.billing &&
+      settings.categoryByType.tech &&
+      settings.categoryByType.report
+    );
   }
 
   getTicketChannelByUser(guild, userId) {
@@ -72,8 +103,9 @@ class TicketService {
     );
   }
 
-  getCategoryIdByType(type) {
-    return this.config.categoryByType[type] || null;
+  getCategoryIdByType(guildId, type) {
+    const settings = this.resolveGuildConfig(guildId);
+    return settings.categoryByType[type] || null;
   }
 
   getTypeInfo(type) {
@@ -113,7 +145,12 @@ class TicketService {
   }
 
   isStaffMember(member) {
-    return Boolean(member && member.roles && member.roles.cache.has(this.config.staffRoleId));
+    if (!member || !member.guild || !member.roles) {
+      return false;
+    }
+
+    const settings = this.resolveGuildConfig(member.guild.id);
+    return Boolean(settings.staffRoleId && member.roles.cache.has(settings.staffRoleId));
   }
 
   buildOpenButtons() {
@@ -135,6 +172,7 @@ class TicketService {
 
   buildSupportPanelEmbed(guild) {
     const stats = this.getStats(guild);
+    const configured = this.isGuildConfigured(guild.id);
 
     return new EmbedBuilder()
       .setColor(this.config.brandColor)
@@ -144,6 +182,7 @@ class TicketService {
         "Bitte beschreibe dein Anliegen im Ticket konkret, damit wir schneller helfen koennen."
       )
       .addFields(
+        { name: "System", value: configured ? "Configured" : "Not configured", inline: true },
         { name: "Open Tickets", value: String(stats.openTotal), inline: true },
         { name: "Billing", value: String(stats.openByType.billing), inline: true },
         { name: "Tech", value: String(stats.openByType.tech), inline: true },
@@ -188,7 +227,15 @@ class TicketService {
     const guild = interaction.guild;
     const user = interaction.user;
     const typeInfo = this.getTypeInfo(type);
-    const categoryId = this.getCategoryIdByType(type);
+    const settings = this.resolveGuildConfig(guild.id);
+    const categoryId = this.getCategoryIdByType(guild.id, type);
+
+    if (!this.isGuildConfigured(guild.id)) {
+      return {
+        ok: false,
+        message: "Support-System ist noch nicht komplett eingerichtet. Nutze `/setup-system`."
+      };
+    }
 
     if (!typeInfo || !categoryId) {
       return {
@@ -229,7 +276,7 @@ class TicketService {
           allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory]
         },
         {
-          id: this.config.staffRoleId,
+          id: settings.staffRoleId,
           allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory]
         }
       ]
@@ -250,7 +297,7 @@ class TicketService {
       .setTimestamp();
 
     await channel.send({
-      content: `${user} <@&${this.config.staffRoleId}>`,
+      content: `${user} <@&${settings.staffRoleId}>`,
       embeds: [embed],
       components: [this.buildTicketActionButtons()]
     });
@@ -353,7 +400,8 @@ class TicketService {
       this.inactivityTimers.delete(channel.id);
     }
 
-    const logChannel = channel.guild.channels.cache.get(this.config.supportLogChannelId);
+    const settings = this.resolveGuildConfig(channel.guild.id);
+    const logChannel = channel.guild.channels.cache.get(settings.supportLogChannelId);
     const meta = parseTopic(channel.topic);
     const type = meta ? meta.type : "unknown";
     const ownerId = meta ? meta.ownerId : "unknown";
@@ -381,7 +429,8 @@ class TicketService {
       return false;
     }
 
-    const categoryIds = new Set(Object.values(this.config.categoryByType));
+    const settings = this.resolveGuildConfig(channel.guild.id);
+    const categoryIds = new Set(Object.values(settings.categoryByType).filter(Boolean));
     const meta = parseTopic(channel.topic);
 
     return (

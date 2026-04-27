@@ -5,6 +5,7 @@ const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 
 const { getConfig } = require("./config/env");
+const { GuildConfigStore } = require("./config/guildConfigStore");
 const { registerCommands } = require("./utils/registerCommands");
 const { TicketService } = require("./tickets/ticketService");
 const logger = require("./utils/logger");
@@ -32,7 +33,8 @@ async function bootstrap() {
 
   await registerCommands(config, [...client.commands.values()]);
 
-  const ticketService = new TicketService(config);
+  const guildConfigStore = new GuildConfigStore(path.join(__dirname, "..", "data", "guild-settings.json"));
+  const ticketService = new TicketService(config, guildConfigStore);
   const context = { config, ticketService };
 
   const eventsPath = path.join(__dirname, "events");
