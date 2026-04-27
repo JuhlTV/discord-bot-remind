@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+﻿const { SlashCommandBuilder, MessageFlags } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -11,12 +11,13 @@ module.exports = {
     if (!ticketService.isTicketChannel(interaction.channel)) {
       await interaction.reply({
         content: "Dieser Command funktioniert nur in einem Ticket-Channel.",
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
       return;
     }
 
-    await interaction.reply({ content: "Ticket wird geschlossen...", ephemeral: true });
+    await interaction.reply({ content: "Ticket wird geschlossen...", flags: MessageFlags.Ephemeral });
     await ticketService.closeTicket(interaction.channel, interaction.user.tag);
   }
 };
+

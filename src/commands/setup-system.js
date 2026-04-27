@@ -1,7 +1,8 @@
-const {
+﻿const {
   SlashCommandBuilder,
   PermissionFlagsBits,
-  ChannelType
+  ChannelType,
+  MessageFlags
 } = require("discord.js");
 
 async function resolveOrCreateCategory(guild, providedCategory, fallbackName, createMissing) {
@@ -115,7 +116,7 @@ module.exports = {
     const { ticketService } = context;
     const guild = interaction.guild;
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const createMissing = interaction.options.getBoolean("create_missing") ?? true;
     const postPanel = interaction.options.getBoolean("post_panel") ?? true;
@@ -195,3 +196,4 @@ module.exports = {
     });
   }
 };
+

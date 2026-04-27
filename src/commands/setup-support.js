@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+﻿const { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -12,6 +12,7 @@ module.exports = {
     const panelComponents = ticketService.buildSupportPanelComponents();
 
     await interaction.channel.send({ embeds: [panelEmbed], components: panelComponents });
-    await interaction.reply({ content: "Support-Panel wurde erstellt.", ephemeral: true });
+    await interaction.reply({ content: "Support-Panel wurde erstellt.", flags: MessageFlags.Ephemeral });
   }
 };
+

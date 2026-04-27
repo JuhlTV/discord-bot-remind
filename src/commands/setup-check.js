@@ -1,8 +1,9 @@
-const {
+﻿const {
   SlashCommandBuilder,
   PermissionFlagsBits,
   EmbedBuilder,
-  ChannelType
+  ChannelType,
+  MessageFlags
 } = require("discord.js");
 
 const REQUIRED_GUILD_PERMS = [
@@ -207,7 +208,7 @@ module.exports = {
     const { ticketService, config } = context;
     const guild = interaction.guild;
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const me = guild.members.me || await guild.members.fetchMe();
     const doAutofix = interaction.options.getBoolean("autofix") ?? false;
@@ -333,3 +334,4 @@ module.exports = {
     await interaction.editReply({ embeds: [embed] });
   }
 };
+

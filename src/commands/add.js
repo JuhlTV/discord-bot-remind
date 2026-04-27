@@ -1,6 +1,7 @@
-const {
+﻿const {
   SlashCommandBuilder,
-  PermissionFlagsBits
+  PermissionFlagsBits,
+  MessageFlags
 } = require("discord.js");
 
 module.exports = {
@@ -22,7 +23,7 @@ module.exports = {
     if (!ticketService.isTicketChannel(interaction.channel)) {
       await interaction.reply({
         content: "Dieser Command funktioniert nur in einem Ticket-Channel.",
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
       return;
     }
@@ -36,3 +37,4 @@ module.exports = {
     await interaction.reply({ content: `${user} wurde zum Ticket hinzugefuegt.` });
   }
 };
+
