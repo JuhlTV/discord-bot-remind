@@ -63,4 +63,5 @@ npm start
 
 - Die Commands werden beim Start automatisch fuer die in `GUILD_ID` gesetzte Test-Guild registriert.
 - Fuer den kompletten Setup in Discord: einmal `/setup-system` ausfuehren.
+- Schneller Reparatur-Flow: `/setup-check autofix:true post_panel:true`.
 - Claim/Unclaim ist fuer Mitglieder mit `STAFF_ROLE_ID` vorgesehen.
