@@ -22,7 +22,7 @@ Ein Support-Discord-Bot im Stil von Galaxy Bot mit Ticket-System.
 npm install
 ```
 
-2. `.env.example` nach `.env` kopieren und mindestens Token/Client/Guild setzen.
+2. `.env.example` nach `.env` kopieren und mindestens Token/Client setzen.
 
 Wichtige Variablen:
 
@@ -61,7 +61,8 @@ npm start
 
 ## Hinweise
 
-- Die Commands werden beim Start automatisch fuer die in `GUILD_ID` gesetzte Test-Guild registriert.
+- Die Commands werden beim Start global registriert (ohne feste GUILD_ID).
+- Bei globalen Commands kann Discord bis zu ca. 1 Stunde brauchen, bis Updates ueberall sichtbar sind.
 - Fuer den kompletten Setup in Discord: einmal `/setup-system` ausfuehren.
 - Schneller Reparatur-Flow: `/setup-check autofix:true post_panel:true`.
 - Claim/Unclaim ist fuer Mitglieder mit `STAFF_ROLE_ID` vorgesehen.

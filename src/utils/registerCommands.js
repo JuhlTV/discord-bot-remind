@@ -6,12 +6,9 @@ async function registerCommands(config, commands) {
   const body = commands.map((cmd) => cmd.data.toJSON());
 
   try {
-    await rest.put(
-      Routes.applicationGuildCommands(config.clientId, config.guildId),
-      { body }
-    );
+    await rest.put(Routes.applicationCommands(config.clientId), { body });
 
-    info(`Slash-Commands registriert: ${commands.length}`);
+    info(`Globale Slash-Commands registriert: ${commands.length}`);
   } catch (err) {
     error("Fehler beim Registrieren der Slash-Commands", err);
     throw err;

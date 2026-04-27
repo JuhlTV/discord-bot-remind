@@ -1,7 +1,6 @@
 const requiredKeys = [
   "DISCORD_TOKEN",
-  "DISCORD_CLIENT_ID",
-  "GUILD_ID"
+  "DISCORD_CLIENT_ID"
 ];
 
 function getConfig() {
@@ -14,7 +13,7 @@ function getConfig() {
   return {
     token: process.env.DISCORD_TOKEN,
     clientId: process.env.DISCORD_CLIENT_ID,
-    guildId: process.env.GUILD_ID,
+    guildId: process.env.GUILD_ID || null,
     defaultCategoryByType: {
       billing: process.env.BILLING_CATEGORY_ID,
       tech: process.env.TECH_CATEGORY_ID,
